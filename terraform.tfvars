@@ -1,0 +1,10 @@
+region            = "us-east-2"
+key_pair_name     = "matheus-kp"
+instance_type     = "t3.micro"
+instance_tag      = ""
+ami               = "ami-036841078a4b68e14"
+file_type         = ""
+cidr_block        = "10.0.0.0/16"
+availability_zone = ["us-east-2a", "us-east-2b"]
+private_subnets   = ["10.0.1.0/24", "10.0.2.0/24"]
+public_subnets    = ["10.0.101.0/24", "10.0.102.0/24"]
