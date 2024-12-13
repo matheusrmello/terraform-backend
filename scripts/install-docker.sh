@@ -1,32 +1,24 @@
 #!/bin/bash
 
-if [ "$(id -u)" -ne 0 ]; then
-    echo "Este script deve ser executado como root." >&2
-    exit 1
-fi
+#!/bin/bash
+# Atualize o sistema
+sudo su
 
-apt-get update -y
-apt-get install ca-certificates curl -y
-install -m 0755 -d /etc/apt/keyrings -y
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-chmod a+r /etc/apt/keyrings/docker.asc
+yum update -y
 
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-  tee /etc/apt/sources.list.d/docker.list > /dev/null
-apt-get update -y
+# Instale dependências para compilar software e wget
+amazon-linux-extras install docker
+yum install -y wget curl
 
-apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin curl conntrack -y
-
-groupadd docker
-
-sudo usermod -aG docker $USER
-
-newgrp docker
-
-systemctl enable docker
-
-systemctl start docker
-
-docker run hello-world
+chech_docker_installed() {
+  if command -v docker &> /dev/null
+  then
+    echo "Docker is not installed."
+  else
+    echo "Docker not found. Installing now..."
+    sudo amazon-linux-extras enable docker
+    sudo yum install -y docker
+    sudo systemctl start docker
+    sudo usermod -aG docker && newgrp docker
+  fi
+}

@@ -1,42 +1,67 @@
 #!/bin/bash
+# Atualize o sistema
+sudo su
 
-if [ "$(id -u)" -ne 0 ]; then
-    echo "Este script deve ser executado como root." >&2
-    exit 1
-fi
+yum update -y
 
-apt-get update -y
-apt-get install ca-certificates curl -y
-install -m 0755 -d /etc/apt/keyrings -y
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-chmod a+r /etc/apt/keyrings/docker.asc
+# Instale dependências para compilar software e wget
+amazon-linux-extras install docker
+yum install -y wget curl
 
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-  tee /etc/apt/sources.list.d/docker.list > /dev/null
-apt-get update -y
+sleep 15s
 
-apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin curl conntrack -y
+chech_docker_installed() {
+  if command -v docker &> /dev/null
+  then
+    echo "Docker is not installed."
+  else
+    echo "Docker not found. Installing now..."
+    sudo amazon-linux-extras enable docker
+    sudo yum install -y docker
+    sudo systemctl start docker
+    sudo usermod -aG docker && newgrp docker
+  fi
+}
+yum install -y docker
+service docker start
+usermod -a -G docker ec2-user
 
-sudo groupadd docker
+sleep 15s
 
-sudo usermod -aG docker $USER
+# Instale o kubectl
+curl -LO "https://dl.k8s.io/release/v1.25.4/bin/linux/amd64/kubectl"
+chmod +x kubectl
+mv kubectl /usr/local/bin/
 
-newgrp docker
+sleep 15s
 
-sudo systemctl enable docker
+# Instalar o Minikube
+LATEST_VERSION=$(curl -s https://api.github.com/repos/kubernetes/minikube/releases/latest | grep "tag_name" | cut -d '"' -f 4)
 
-sudo systemctl start docker
+curl -Lo minikube https://storage.googleapis.com/minikube/releases/${LATEST_VERSION}/minikube-linux-amd64
+chmod +x minikube
+mv minikube /usr/local/bin/
 
-curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-amd64
-chmod +x ./kind
-mv ./kind /usr/local/bin/kind
+sleep 15s
 
-sudo kind version
+check_minikube_started() {
+  if minikube profile list | grep -q "minikube"
+  then
+    echo "Minikube perfil 'minikube' founded."
+    if minikube status | grep -q "minikube"
+    then
+      echo "Minikube is running."
+    else
+      echo "Minikube is not running. Starting now..."
+      minikube start --driver=docker || (echo "Error started Minikube"; exit 1)
+    fi
+  else
+    echo "Minikube profile 'minikube' not founded. Create a new profile and startded Minikube"
+    minikube start --driver=docker || (echo "Error started Minikube"; exit 1)
+  fi
+}
 
-curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+check_minikube_started
 
-install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+minikube status
 
-sudo kind create cluster

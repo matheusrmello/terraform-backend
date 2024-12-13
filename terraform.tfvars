@@ -1,8 +1,8 @@
 region              = "us-east-2"
 key_pair_name       = "matheus-kp"
-instance_type       = "t3.micro"
+instance_type       = "t3.medium"
 instance_tag        = ""
-ami                 = "ami-036841078a4b68e14"
+ami                 = "ami-0c80e2b6ccb9ad6d1"
 file_type           = ""
 cidr_block          = "10.0.0.0/16"
 availability_zone   = ["us-east-2a", "us-east-2b"]
