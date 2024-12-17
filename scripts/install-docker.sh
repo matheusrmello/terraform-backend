@@ -1,6 +1,5 @@
 #!/bin/bash
 
-#!/bin/bash
 # Atualize o sistema
 sudo su
 

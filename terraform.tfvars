@@ -1,14 +1,6 @@
-region              = "us-east-2"
-key_pair_name       = "matheus-kp"
-instance_type       = "t3.medium"
-instance_tag        = ""
-ami                 = "ami-0c80e2b6ccb9ad6d1"
-file_type           = ""
-cidr_block          = "10.0.0.0/16"
-availability_zone   = ["us-east-2a", "us-east-2b"]
-private_subnets     = ["10.0.1.0/24", "10.0.2.0/24"]
-public_subnets      = ["10.0.101.0/24", "10.0.102.0/24"]
 s3_bucket           = "test-matheus-bucket-frontend-1"
 cdn_domain          = ""
 route53_zone_domain = "exam.ezopscloud.tech"
-default_tags        = "test-matheus"
+service             = "test-matheus-terraform-cdn"
+key_pair_name       = "matheus-kp"
+ecr_repo_url        = "654654369899.dkr.ecr.us-east-2.amazonaws.com/test-matheus-app-node-api"

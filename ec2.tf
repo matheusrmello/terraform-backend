@@ -1,11 +1,14 @@
-resource "aws_instance" "ec2-backend" {
-  count                  = 2
-  ami                    = var.ami
-  instance_type          = var.instance_type
-  vpc_security_group_ids = [aws_security_group.sg_docker.id]
-  key_name               = var.key_pair_name
-  monitoring             = true
-  subnet_id              = module.vpc.public_subnets[0]
+resource "aws_instance" "instance-backend" {
+  count                       = var.backend_instance_count
+  ami                         = var.ami_id
+  instance_type               = var.instance_type
+  vpc_security_group_ids      = [aws_security_group.sg_k8s.id]
+  key_name                    = var.key_pair_name
+  subnet_id                   = module.vpc.public_subnets[0]
+  monitoring                  = true
+  associate_public_ip_address = var.associate_public_ip
+
+
 
   tags = {
     Name = "matheus-test-backend ${count.index + 1}"
@@ -13,14 +16,15 @@ resource "aws_instance" "ec2-backend" {
 
 }
 
-resource "aws_instance" "ec2-docker" {
-  ami                    = var.ami
-  instance_type          = var.instance_type
-  vpc_security_group_ids = [aws_security_group.sg_docker.id]
-  key_name               = var.key_pair_name
-  subnet_id              = module.vpc.public_subnets[0]
-  monitoring             = true
-  user_data              = file("${path.module}/scripts/install-docker.sh")
+resource "aws_instance" "instance-docker" {
+  ami                         = var.ami_id
+  instance_type               = var.instance_type
+  vpc_security_group_ids      = [aws_security_group.sg_docker.id]
+  key_name                    = var.key_pair_name
+  subnet_id                   = module.vpc.public_subnets[0]
+  monitoring                  = true
+  associate_public_ip_address = var.associate_public_ip
+  user_data                   = file("${path.module}/scripts/install-docker.sh")
 
   tags = {
     Name = "matheus-test-docker"
@@ -28,14 +32,15 @@ resource "aws_instance" "ec2-docker" {
 
 }
 
-resource "aws_instance" "ec2-k8s" {
-  ami                    = var.ami
-  instance_type          = var.instance_type
-  vpc_security_group_ids = [aws_security_group.sg_k8s.id]
-  key_name               = var.key_pair_name
-  subnet_id              = module.vpc.public_subnets[0]
-  monitoring             = true
-  user_data              = file("${path.module}/scripts/install-k8s.sh")
+resource "aws_instance" "instance-k8s" {
+  ami                         = var.ami_id
+  instance_type               = var.instance_type
+  vpc_security_group_ids      = [aws_security_group.sg_k8s.id]
+  key_name                    = var.key_pair_name
+  subnet_id                   = module.vpc.public_subnets[0]
+  monitoring                  = true
+  associate_public_ip_address = var.associate_public_ip
+  user_data                   = file("${path.module}/scripts/install-k8s.sh")
 
   # user_data = <<-EOF
   #   #!/bin/bash

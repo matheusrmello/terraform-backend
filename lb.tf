@@ -1,5 +1,5 @@
 resource "aws_elb" "matheus-test-elb" {
-  name               = "matheus-test-elb"
+  name               = "test-matheus-elb"
   availability_zones = var.availability_zone
 
   listener {
