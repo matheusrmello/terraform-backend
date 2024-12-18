@@ -16,12 +16,12 @@ resource "aws_ecs_task_definition" "deploy_api" {
 
   container_definitions = jsonencode([{
     "name" : "node-api-server",
-    "image" : "654654369899.dkr.ecr.us-east-2.amazonaws.com/test-matheus-app-node-api:v4",
+    "image" : "654654369899.dkr.ecr.us-east-2.amazonaws.com/test-matheus-app-node-api:latest",
     "essential" : true,
     "portMappings" : [
       {
-        "containerPort" : 5000,
-        "hostPort" : 5000
+        "containerPort" : 3000,
+        "hostPort" : 3000
       }
     ],
     "environment" : [
@@ -45,8 +45,17 @@ resource "aws_ecs_task_definition" "deploy_api" {
         "name" : "DB_NAME",
         "value" : "blog"
       }
-    ]
-  }])
+    ],
+    "logConfiguration": {
+      "logDriver": "awslogs",
+          "options": {
+            "awslogs-group": aws_cloudwatch_log_group.ecs_log_group.name,
+            "awslogs-region": "us-east-2",
+            "awslogs-stream-prefix": "ecs",
+            "awslogs-create-group": "true"
+    }
+  }
+}])
 }
 
 resource "aws_ecs_service" "ecs_service" {
@@ -62,7 +71,7 @@ resource "aws_ecs_service" "ecs_service" {
   load_balancer {
     target_group_arn = aws_lb_target_group.ecs_tg.arn
     container_name   = "node-api-server"
-    container_port   = 5000
+    container_port   = 3000
   }
 
   network_configuration {
@@ -71,5 +80,10 @@ resource "aws_ecs_service" "ecs_service" {
     assign_public_ip = true
   }
 
+}
+
+resource "aws_cloudwatch_log_group" "ecs_log_group" {
+  name = "/ecs/api-service"
+  retention_in_days = 3
 }
 

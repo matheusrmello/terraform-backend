@@ -8,18 +8,20 @@ resource "aws_lb" "ecs_lb" {
 
 resource "aws_lb_target_group" "ecs_tg" {
   name        = "test-matheus-tg"
-  port        = 5000
+  port        = 3000
   protocol    = "HTTP"
   target_type = "ip"
   vpc_id      = module.vpc.vpc_id
 
   health_check {
-    path                = "/"
-    interval            = 30
-    timeout             = 5
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
+    path = "/posts"
+    port = 3000
+    protocol = "HTTP"
+    healthy_threshold = 3
+    unhealthy_threshold = 3
+    matcher = "200-499"
   }
+
 }
 
 resource "aws_lb_listener" "ecs_listener" {
