@@ -87,7 +87,7 @@ variable "default_tags" {
 
 variable "cluster_name" {
   description = "The name of the ECS cluster"
-  default     = "test-matheus-ecs-cluster"
+  default     = "test_matheus_ecs_cluster"
 }
 
 variable "container_name" {

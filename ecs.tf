@@ -20,8 +20,9 @@ resource "aws_ecs_task_definition" "deploy_api" {
     "essential" : true,
     "portMappings" : [
       {
-        "containerPort" : 3000,
-        "hostPort" : 3000
+        "containerPort" : 4000,
+        "hostPort" : 4000,
+        "protocol" : "tcp"
       }
     ],
     "environment" : [
@@ -46,16 +47,16 @@ resource "aws_ecs_task_definition" "deploy_api" {
         "value" : "blog"
       }
     ],
-    "logConfiguration": {
-      "logDriver": "awslogs",
-          "options": {
-            "awslogs-group": aws_cloudwatch_log_group.ecs_log_group.name,
-            "awslogs-region": "us-east-2",
-            "awslogs-stream-prefix": "ecs",
-            "awslogs-create-group": "true"
+    "logConfiguration" : {
+      "logDriver" : "awslogs",
+      "options" : {
+        "awslogs-group" : aws_cloudwatch_log_group.ecs_log_group.name,
+        "awslogs-region" : "us-east-2",
+        "awslogs-stream-prefix" : "ecs",
+        "awslogs-create-group" : "true"
+      }
     }
-  }
-}])
+  }])
 }
 
 resource "aws_ecs_service" "ecs_service" {
@@ -71,19 +72,17 @@ resource "aws_ecs_service" "ecs_service" {
   load_balancer {
     target_group_arn = aws_lb_target_group.ecs_tg.arn
     container_name   = "node-api-server"
-    container_port   = 3000
+    container_port   = 4000
   }
 
   network_configuration {
-    subnets          = module.vpc.public_subnets
+    subnets          = [aws_subnet.private_subnet_1.id, aws_subnet.private_subnet_2.id, aws_subnet.private_subnet_3.id]
     security_groups  = [aws_security_group.sg_ecs.id]
-    assign_public_ip = true
+    assign_public_ip = false
   }
-
 }
 
 resource "aws_cloudwatch_log_group" "ecs_log_group" {
-  name = "/ecs/api-service"
-  retention_in_days = 3
+  name              = "/ecs/api-service"
+  retention_in_days = 1
 }
-

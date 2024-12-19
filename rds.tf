@@ -1,28 +1,44 @@
 resource "aws_db_instance" "postgres_db" {
-  allocated_storage    = 10
-  db_name              = "blog"
-  engine               = "postgres"
-  engine_version       = "11"
-  instance_class       = "db.t3.micro"
-  username             = "root"
-  password             = "928BDeuE"
-  skip_final_snapshot  = true
-  db_subnet_group_name = aws_db_subnet_group.db_subnet.id
+  identifier             = "rds-postgres"
+  allocated_storage      = 20
+  engine                 = "postgres"
+  engine_version         = "11"
+  instance_class         = "db.t3.micro"
+  db_name                = "blog"
+  username               = "root"
+  password               = "928BDeuE"
+  skip_final_snapshot    = true
+  vpc_security_group_ids = [aws_security_group.rds_sg.id]
+  db_subnet_group_name   = aws_db_subnet_group.db_subnet.id
+
+  tags = {
+    Name = "test-matheus-rds"
+  }
+}
+
+resource "null_resource" "create_table" {
+  provisioner "local-exec" {
+    command = <<EOT
+      set PGPASSWORD=928BDeuE
+      psql -h ${aws_db_instance.postgres_db.address} -U root -d $blog -c "
+        CREATE SCHEMA IF NOT EXISTS blog;
+        CREATE TABLE IF NOT EXISTS blog.post (
+          id SERIAL PRIMARY KEY,
+          title TEXT NOT NULL,
+          content TEXT NOT NULL,
+          date TIMESTAMP DEFAULT NOW()
+        );
+      "
+    EOT
+  }
+  depends_on = [aws_db_instance.postgres_db]
 }
 
 resource "aws_db_subnet_group" "db_subnet" {
   name       = "db_subnet"
-  subnet_ids = [module.vpc.public_subnets[0], module.vpc.public_subnets[1], module.vpc.public_subnets[2], ]
+  subnet_ids = [aws_subnet.rds_subnet_1.id, aws_subnet.rds_subnet_2.id]
+
+  tags = {
+    Name = "test-rds-subnet-group"
+  }
 }
-
-# resource "aws_subnet" "public_subnets_db_1" {
-#   vpc_id = module.vpc.id
-#   cidr_block = "10.0.103.0/24"
-#   availability_zone = "us-east-2a"
-# }
-
-# resource "aws_subnet" "public_subnets_db_2" {
-#   vpc_id = module.vpc.id
-#   cidr_block = "10.0.104.0/24"
-#   availability_zone = "us-east-2b"
-# }

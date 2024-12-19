@@ -2,26 +2,32 @@ resource "aws_lb" "ecs_lb" {
   name               = "test-matheus-lb"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [aws_security_group.sg_ecs.id]
-  subnets            = module.vpc.public_subnets
+  security_groups    = [aws_security_group.alb_sg.id]
+  subnets            = [aws_subnet.private_subnet_1.id, aws_subnet.private_subnet_2.id, aws_subnet.private_subnet_3.id]
+
+  tags = {
+    Name = "test-matheus-ecs_lb"
+  }
 }
 
 resource "aws_lb_target_group" "ecs_tg" {
   name        = "test-matheus-tg"
-  port        = 3000
+  port        = 4000
   protocol    = "HTTP"
   target_type = "ip"
-  vpc_id      = module.vpc.vpc_id
+  vpc_id      = aws_vpc.project_vpc.id
 
   health_check {
-    path = "/posts"
-    port = 3000
-    protocol = "HTTP"
-    healthy_threshold = 3
+    path                = "/posts"
+    protocol            = "HTTP"
+    healthy_threshold   = 3
     unhealthy_threshold = 3
-    matcher = "200-499"
+    matcher             = "200-499"
+    port                = "4000"
   }
-
+  tags = {
+    Name = "test-matheus-ecs_tg"
+  }
 }
 
 resource "aws_lb_listener" "ecs_listener" {
