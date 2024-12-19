@@ -41,8 +41,8 @@ resource "aws_instance" "instance-docker" {
     }
   }
 
-  provisioner "remote-exec" {
-    inline = [
+  provisioner "local-exec" {
+    command = <<EOT
       "sleep 20",
       "sudo yum update -y",
       "sudo yum install -y docker",
@@ -59,15 +59,36 @@ resource "aws_instance" "instance-docker" {
       "cd compose-ezops",
       "sleep 15",
       "sudo docker-compose up -d"
-    ]
-
-    connection {
-      type        = "ssh"
-      user        = "ec2-user"
-      private_key = file("./matheus-kp.pem")
-      host        = self.public_ip
-    }
+    EOT
   }
+
+  # provisioner "remote-exec" {
+  #   inline = [
+  #     "sleep 20",
+  #     "sudo yum update -y",
+  #     "sudo yum install -y docker",
+  #     "sudo systemctl start docker",
+  #     "sudo systemctl enable docker",
+  #     "sudo usermod -a -G docker ec2-user",
+  #     "sudo yum install -y git",
+  #     "sudo chkconfig docker on",
+  #     "sleep 15",
+  #     "sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose",
+  #     "sudo chmod +x /usr/local/bin/docker-compose",
+  #     "sleep 15",
+  #     "git clone https://github.com/matheusrmello/compose-ezops.git",
+  #     "cd compose-ezops",
+  #     "sleep 15",
+  #     "sudo docker-compose up -d"
+  #   ]
+
+  #   connection {
+  #     type        = "ssh"
+  #     user        = "ec2-user"
+  #     private_key = file("./matheus-kp.pem")
+  #     host        = self.public_ip
+  #   }
+  # }
 
   tags = {
     Name = "matheus-test-docker"
