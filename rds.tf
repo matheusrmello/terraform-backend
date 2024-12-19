@@ -23,6 +23,13 @@ resource "null_resource" "create_table" {
       "psql -h ${aws_db_instance.postgres_db.address} -U root -d blog -c \"CREATE SCHEMA IF NOT EXISTS blog;\"",
       "psql -h ${aws_db_instance.postgres_db.address} -U root -d blog -c \"CREATE TABLE IF NOT EXISTS blog.post (id SERIAL PRIMARY KEY, title TEXT NOT NULL, content TEXT NOT NULL, date TIMESTAMP DEFAULT NOW());\""
     ]
+
+    connection {
+      type        = "ssh"
+      user        = "ec2-user"
+      private_key = file("./matheus-kp.pem")
+      host        = self.public_ip
+    }
   }
   depends_on = [aws_db_instance.postgres_db]
 }
