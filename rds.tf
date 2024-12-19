@@ -17,19 +17,12 @@ resource "aws_db_instance" "postgres_db" {
 }
 
 resource "null_resource" "create_table" {
-  provisioner "local-exec" {
-    command = <<EOT
-      set PGPASSWORD=928BDeuE
-      psql -h ${aws_db_instance.postgres_db.address} -U root -d $blog -c "
-        CREATE SCHEMA IF NOT EXISTS blog;
-        CREATE TABLE IF NOT EXISTS blog.post (
-          id SERIAL PRIMARY KEY,
-          title TEXT NOT NULL,
-          content TEXT NOT NULL,
-          date TIMESTAMP DEFAULT NOW()
-        );
-      "
-    EOT
+  provisioner "remote-exec" {
+    inline = [
+      "set PGPASSWORD=928BDeuE",
+      "psql -h ${aws_db_instance.postgres_db.address} -U root -d ${aws_db_instance.postgres_db.name} -c \"CREATE SCHEMA IF NOT EXISTS blog;\"",
+      "psql -h ${aws_db_instance.postgres_db.address} -U root -d ${aws_db_instance.postgres_db.name} -c \"CREATE TABLE IF NOT EXISTS blog.post (id SERIAL PRIMARY KEY, title TEXT NOT NULL, content TEXT NOT NULL, date TIMESTAMP DEFAULT NOW());\""
+    ]
   }
   depends_on = [aws_db_instance.postgres_db]
 }
