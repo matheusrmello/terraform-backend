@@ -3,7 +3,7 @@ resource "aws_instance" "instance-backend" {
   ami                         = var.ami_id
   instance_type               = var.instance_type
   vpc_security_group_ids      = [aws_security_group.sg_k8s.id]
-  # key_name                    = var.key_pair_name
+  key_name                    = var.key_pair_name
   subnet_id                   = aws_subnet.public_subnet_1.id
   monitoring                  = true
   associate_public_ip_address = var.associate_public_ip
@@ -27,7 +27,7 @@ resource "aws_instance" "instance-docker" {
   ami                         = var.ami_id
   instance_type               = var.instance_type
   vpc_security_group_ids      = [aws_security_group.sg_docker.id]
-  # key_name                    = var.key_pair_name
+  key_name                    = var.key_pair_name
   subnet_id                   = aws_subnet.public_subnet_1.id
   monitoring                  = true
   associate_public_ip_address = var.associate_public_ip
@@ -79,7 +79,7 @@ resource "aws_instance" "instance-k8s" {
   ami                         = var.ami_id
   instance_type               = var.instance_type
   vpc_security_group_ids      = [aws_security_group.sg_k8s.id]
-  # key_name                    = var.key_pair_name
+  key_name                    = var.key_pair_name
   subnet_id                   = aws_subnet.public_subnet_1.id
   monitoring                  = true
   associate_public_ip_address = var.associate_public_ip
@@ -101,7 +101,6 @@ resource "aws_instance" "instance-k8s" {
       "sudo systemctl start docker",
       "sudo systemctl enable docker",
       "sudo usermod -aG docker $USER",
-      # "newgrp docker",
       "sudo yum install -y git",
       "sudo chkconfig docker on",
       "curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64",
@@ -118,7 +117,6 @@ resource "aws_instance" "instance-k8s" {
       "cd compose-ezops/k8s/",
       "sudo kubectl create ns test",
       "sudo kubectl apply -f ./ -n test",
-      # "minikube status"
     ]
 
     connection {
