@@ -1,28 +1,3 @@
-resource "aws_instance" "instance-backend" {
-  count                       = var.backend_instance_count
-  ami                         = var.ami_id
-  instance_type               = var.instance_type
-  vpc_security_group_ids      = [aws_security_group.sg_k8s.id]
-  key_name                    = var.key_pair_name
-  subnet_id                   = aws_subnet.public_subnet_1.id
-  monitoring                  = true
-  associate_public_ip_address = var.associate_public_ip
-
-  root_block_device {
-    volume_size           = 20
-    volume_type           = "gp3"
-    delete_on_termination = true
-    tags = {
-      Name = "matheus-test-backend-disk"
-    }
-  }
-
-  tags = {
-    Name = "matheus-test-backend ${count.index + 1}"
-  }
-
-}
-
 resource "aws_instance" "instance-docker" {
   ami                         = var.ami_id
   instance_type               = var.instance_type
