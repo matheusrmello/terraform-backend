@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     bucket = "test-matheus-tfstate"
-    key    = "test/tfstate"
+    key    = "backend/tfstate"
     # dynamodb_table = "test-matheus-terraform-state"
     region = "us-east-2"
   }
