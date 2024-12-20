@@ -3,11 +3,6 @@ variable "region" {
   default     = "us-east-2"
 }
 
-variable "s3_bucket" {
-  description = "Bucket S3"
-  type        = string
-}
-
 ################# EC2 #########################
 
 variable "key_pair_name" {
