@@ -13,10 +13,21 @@ resource "aws_alb" "application_load_balancer" {
 
 resource "aws_lb_target_group" "ecs_tg" {
   name        = "test-matheus-tg"
-  port        = 4000
+  port        = 80
   protocol    = "HTTP"
   target_type = "ip"
   vpc_id      = aws_vpc.project_vpc.id
+
+  health_check {
+    protocol            = "HTTP"
+    port                = 80
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    path                = "/"
+    matcher             = "200-499"
+  }
 
   tags = {
     Name = "test-matheus-ecs_tg"

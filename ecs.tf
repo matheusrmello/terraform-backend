@@ -14,50 +14,108 @@ resource "aws_ecs_task_definition" "deploy_api" {
   memory                   = 2048
   execution_role_arn       = aws_iam_role.ecsTaskRole.arn
 
-  container_definitions = jsonencode([{
-    "name" : "node-api-server",
-    "image" : "654654369899.dkr.ecr.us-east-2.amazonaws.com/test-matheus-app-node-api:latest",
-    "essential" : true,
-    "entryPoint" : [],
-    "portMappings" : [
-      {
-        "containerPort" : 4000,
-        "hostPort" : 4000,
-        "protocol" : "tcp"
+  container_definitions = jsonencode([
+    {
+      "name" : "node-api-server",
+      "image" : "654654369899.dkr.ecr.us-east-2.amazonaws.com/test-matheus-app-node-api:latest",
+      "essential" : true,
+      "entryPoint" : [],
+      "portMappings" : [
+        {
+          "containerPort" : 4000,
+          "hostPort" : 4000,
+          "protocol" : "tcp"
+        }
+      ],
+      "environment" : [
+        {
+          "name" : "DB_HOST",
+          "value" : "postgres"
+        },
+        {
+          "name" : "DB_PORT",
+          "value" : "5432"
+        },
+        {
+          "name" : "DB_USER",
+          "value" : "root"
+        },
+        {
+          "name" : "DB_PASS",
+          "value" : "928BDeuE"
+        },
+        {
+          "name" : "DB_NAME",
+          "value" : "blog"
+        }
+      ],
+      "logConfiguration" : {
+        "logDriver" : "awslogs",
+        "options" : {
+          "awslogs-group" : aws_cloudwatch_log_group.ecs_log_group.name,
+          "awslogs-region" : "us-east-2",
+          "awslogs-stream-prefix" : "ecs",
+          "awslogs-create-group" : "true"
+        }
       }
-    ],
-    "environment" : [
-      {
-        "name" : "DB_HOST",
-        "value" : aws_db_instance.postgres_db.endpoint
-      },
-      {
-        "name" : "DB_PORT",
-        "value" : "5432"
-      },
-      {
-        "name" : "DB_USER",
-        "value" : "root"
-      },
-      {
-        "name" : "DB_PASS",
-        "value" : "928BDeuE"
-      },
-      {
-        "name" : "DB_NAME",
-        "value" : "blog"
+    },
+    {
+      "name" : "vue-app",
+      "image" : "matheusmello09/vue-js:latest",
+      "essential" : true,
+      "portMappings" : [
+        {
+          "containerPort" : 3000,
+          "hostPort" : 3000,
+          "protocol" : "tcp"
+        }
+      ]
+      "logConfiguration" : {
+        "logDriver" : "awslogs",
+        "options" : {
+          "awslogs-group" : aws_cloudwatch_log_group.ecs_log_group.name,
+          "awslogs-region" : "us-east-2",
+          "awslogs-stream-prefix" : "ecs",
+          "awslogs-create-group" : "true"
+        }
       }
-    ],
-    "logConfiguration" : {
-      "logDriver" : "awslogs",
-      "options" : {
-        "awslogs-group" : aws_cloudwatch_log_group.ecs_log_group.name,
-        "awslogs-region" : "us-east-2",
-        "awslogs-stream-prefix" : "ecs",
-        "awslogs-create-group" : "true"
+    },
+    {
+      "name" : "postgres",
+      "image" : "postgres:11",
+      "essential" : true,
+      "portMappings" : [
+        {
+          "containerPort" : 5432,
+          "hostPort" : 5432,
+          "protocol" : "tcp"
+        }
+      ],
+      "environment" : [
+        {
+          "name" : "POSTGRES_USER",
+          "value" : "root"
+        },
+        {
+          "name" : "POSTGRES_PASSWORD",
+          "value" : "928BDeuE"
+        },
+        {
+          "name" : "POSTGRES_DB",
+          "value" : "blog"
+        }
+      ],
+      "logConfiguration" : {
+        "logDriver" : "awslogs",
+        "options" : {
+          "awslogs-group" : aws_cloudwatch_log_group.ecs_log_group.name,
+          "awslogs-region" : "us-east-2",
+          "awslogs-stream-prefix" : "ecs",
+          "awslogs-create-group" : "true"
+        }
       }
     }
-  }])
+  ])
 }
 
 resource "aws_ecs_service" "ecs_service" {
@@ -69,12 +127,11 @@ resource "aws_ecs_service" "ecs_service" {
   scheduling_strategy  = "REPLICA"
   force_delete         = true
   force_new_deployment = true
-  # depends_on           = [aws_iam_role.task_execution_role]
 
   load_balancer {
     target_group_arn = aws_lb_target_group.ecs_tg.arn
-    container_name   = "node-api-server"
-    container_port   = 4000
+    container_name   = "vue-app"
+    container_port   = 3000
   }
 
   network_configuration {

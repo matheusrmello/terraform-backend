@@ -1,10 +1,10 @@
 resource "aws_instance" "instance-docker" {
-  ami                         = var.ami_id
-  instance_type               = var.instance_type
-  vpc_security_group_ids      = [aws_security_group.sg_docker.id]
-  key_name                    = var.key_pair_name
-  subnet_id                   = aws_subnet.public_subnet_1.id
-  monitoring                  = true
+  ami                    = var.ami_id
+  instance_type          = var.instance_type
+  vpc_security_group_ids = [aws_security_group.sg_docker.id]
+  key_name               = var.key_pair_name
+  subnet_id              = aws_subnet.public_subnet_1.id
+  monitoring             = true
   # associate_public_ip_address = var.associate_public_ip
 
   root_block_device {
