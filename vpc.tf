@@ -13,6 +13,17 @@ resource "aws_eip" "epi" {
 
 }
 
+resource "aws_eip" "eip_docker" {
+  domain = "vpc"
+
+}
+
+resource "aws_eip_association" "eip_docker_association" {
+  instance_id   = aws_instance.instance-docker.id
+  allocation_id = aws_eip.eip_docker.id
+  
+}
+
 resource "aws_nat_gateway" "test-nat_gateway" {
   allocation_id = aws_eip.epi.id
   subnet_id     = aws_subnet.public_subnet_1.id

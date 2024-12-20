@@ -5,7 +5,7 @@ resource "aws_instance" "instance-docker" {
   key_name                    = var.key_pair_name
   subnet_id                   = aws_subnet.public_subnet_1.id
   monitoring                  = true
-  associate_public_ip_address = var.associate_public_ip
+  # associate_public_ip_address = var.associate_public_ip
 
   root_block_device {
     volume_size           = 20
