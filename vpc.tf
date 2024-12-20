@@ -9,12 +9,14 @@ resource "aws_vpc" "project_vpc" {
 }
 
 resource "aws_eip" "epi" {
+  domain = "vpc"
 
 }
 
 resource "aws_nat_gateway" "test-nat_gateway" {
   allocation_id = aws_eip.epi.id
   subnet_id     = aws_subnet.public_subnet_1.id
+  depends_on    = [aws_internet_gateway.igw]
 }
 
 resource "aws_internet_gateway" "igw" {

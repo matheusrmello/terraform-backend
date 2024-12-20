@@ -71,11 +71,7 @@ variable "associate_public_ip" {
   default     = true
 }
 
-variable "backend_instance_count" {
-  type        = number
-  description = "Numero de instancia que serão provisionadas"
-  default     = 2
-}
+
 
 ################# ECS #########################
 
