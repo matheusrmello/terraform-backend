@@ -1,6 +1,2 @@
-s3_bucket           = "test-matheus-bucket-frontend-1"
-cdn_domain          = ""
-route53_zone_domain = "exam.ezopscloud.tech"
-service             = "test-matheus-terraform-cdn"
-key_pair_name       = "matheus-kp"
-ecr_repo_url        = "654654369899.dkr.ecr.us-east-2.amazonaws.com/test-matheus-app-node-api"
+key_pair_name = "matheus-kp"
+ecr_repo_url  = "654654369899.dkr.ecr.us-east-2.amazonaws.com/test-matheus-app-node-api"
