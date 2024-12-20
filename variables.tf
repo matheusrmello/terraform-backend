@@ -65,7 +65,7 @@ variable "host_port" {
 
 variable "desired_count" {
   description = "number os desired tasks"
-  default     = 2
+  default     = 1
 }
 
 ################# VPC #########################
