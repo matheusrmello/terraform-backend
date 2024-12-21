@@ -1,5 +1,5 @@
 resource "aws_alb" "application_load_balancer" {
-  name               = "test-matheus-alb"
+  name               = "test-matheus-alb-application"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
@@ -20,7 +20,7 @@ resource "aws_lb_target_group" "ecs_tg" {
 
   health_check {
     protocol            = "HTTP"
-    port                = 80
+    port                = 3000
     interval            = 30
     timeout             = 5
     healthy_threshold   = 2

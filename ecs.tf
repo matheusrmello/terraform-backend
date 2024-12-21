@@ -17,36 +17,43 @@ resource "aws_ecs_task_definition" "deploy_api" {
   container_definitions = jsonencode([
     {
       "name" : "node-api-server",
-      "image" : "654654369899.dkr.ecr.us-east-2.amazonaws.com/test-matheus-app-node-api:latest",
+      "image" : "${var.ecr_repo_url}",
       "essential" : true,
       "entryPoint" : [],
+      "command": ["node", "server/server.js"],
       "portMappings" : [
         {
-          "containerPort" : 4000,
-          "hostPort" : 4000,
+          "containerPort" : "${var.api_container_port}",
+          "hostPort" : "${var.api_host_port}",
           "protocol" : "tcp"
+        }
+      ],
+      "dependsOn" : [
+        {
+          "containerName" : "postgres",
+          "condition" : "COMPLETE"
         }
       ],
       "environment" : [
         {
           "name" : "DB_HOST",
-          "value" : "postgres"
+          "value" : "${var.db_host}"
         },
         {
           "name" : "DB_PORT",
-          "value" : "5432"
+          "value" : "${var.db_port}"
         },
         {
           "name" : "DB_USER",
-          "value" : "root"
+          "value" : "${var.db_user}"
         },
         {
           "name" : "DB_PASS",
-          "value" : "928BDeuE"
+          "value" : "${var.db_pass}"
         },
         {
           "name" : "DB_NAME",
-          "value" : "blog"
+          "value" : "${var.db_name}"
         }
       ],
       "logConfiguration" : {
@@ -65,8 +72,8 @@ resource "aws_ecs_task_definition" "deploy_api" {
       "essential" : true,
       "portMappings" : [
         {
-          "containerPort" : 3000,
-          "hostPort" : 3000,
+          "containerPort" : "${var.web_container_port}",
+          "hostPort" : "${var.web_host_port}",
           "protocol" : "tcp"
         }
       ]
@@ -82,8 +89,8 @@ resource "aws_ecs_task_definition" "deploy_api" {
     },
     {
       "name" : "postgres",
-      "image" : "postgres:11",
-      "essential" : true,
+      "image" : "matheusmello09/postgres-with-schema:latest",
+      "essential" : false,
       "portMappings" : [
         {
           "containerPort" : 5432,
@@ -94,15 +101,15 @@ resource "aws_ecs_task_definition" "deploy_api" {
       "environment" : [
         {
           "name" : "POSTGRES_USER",
-          "value" : "root"
+          "value" : "${var.db_user}"
         },
         {
           "name" : "POSTGRES_PASSWORD",
-          "value" : "928BDeuE"
+          "value" : "${var.db_pass}"
         },
         {
           "name" : "POSTGRES_DB",
-          "value" : "blog"
+          "value" : "${var.db_name}"
         }
       ],
       "logConfiguration" : {
@@ -131,7 +138,7 @@ resource "aws_ecs_service" "ecs_service" {
   load_balancer {
     target_group_arn = aws_lb_target_group.ecs_tg.arn
     container_name   = "vue-app"
-    container_port   = 3000
+    container_port   = var.web_container_port
   }
 
   network_configuration {

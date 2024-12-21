@@ -1,5 +1,5 @@
 resource "aws_vpc" "project_vpc" {
-  cidr_block           = "10.0.0.0/16"
+  cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true
   enable_dns_support   = true
 
@@ -8,7 +8,7 @@ resource "aws_vpc" "project_vpc" {
   }
 }
 
-resource "aws_eip" "epi" {
+resource "aws_eip" "eip" {
   domain = "vpc"
 
 }
@@ -25,7 +25,7 @@ resource "aws_eip_association" "eip_docker_association" {
 }
 
 resource "aws_nat_gateway" "test-nat_gateway" {
-  allocation_id = aws_eip.epi.id
+  allocation_id = aws_eip.eip.id
   subnet_id     = aws_subnet.public_subnet_1.id
   depends_on    = [aws_internet_gateway.igw]
 }

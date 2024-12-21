@@ -53,22 +53,62 @@ variable "ecr_repo_url" {
   type        = string
 }
 
-variable "container_port" {
+variable "api_container_port" {
   description = "The container port to expose"
-  default     = 8080
+  default     = 4000
 }
 
-variable "host_port" {
+variable "api_host_port" {
   description = "The host port to map to the container port"
-  default     = 8080
+  default     = 4000
 }
 
+variable "web_container_port" {
+  description = "The container port to expose"
+  default     = 3000
+}
+
+variable "web_host_port" {
+  description = "The host port to map to the container port"
+  default     = 3000
+}
+
+variable "db_host" {
+  description = "The database host"
+  default     = "postgres"
+}
+
+variable "db_name" {
+  description = "The database name"
+  type        = string
+}
+
+variable "db_user" {
+  description = "The database user"
+  type        = string
+}
+
+variable "db_pass" {
+  description = "The database password"
+  type        = string
+}
+
+variable "db_port" {
+  description = "The database port"
+  default     = "5432"
+
+}
 variable "desired_count" {
   description = "number os desired tasks"
   default     = 1
 }
 
 ################# VPC #########################
+variable "vpc_cidr" {
+  description = "CIDR for the VPC"
+  default     = "10.0.0.0/16"
+}
+
 
 variable "availability_zone" {
   description = "Availability Zones for the subnet"

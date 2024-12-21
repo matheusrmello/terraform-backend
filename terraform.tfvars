@@ -1,2 +1,5 @@
 key_pair_name = "matheus-kp"
-ecr_repo_url  = "654654369899.dkr.ecr.us-east-2.amazonaws.com/test-matheus-app-node-api"
+ecr_repo_url  = "matheusmello09/nodejs-api:latest"
+db_name       = "blog"
+db_user       = "root"
+db_pass       = "928BDeuE"
