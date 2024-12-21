@@ -7,10 +7,11 @@ Projeto de Terraform para subir uma aplicação uma aplicação feita em Node.js
 
 ## Tecnologias usadas
 
+- Node.js
+- PostgreSQL
 - Docker
 - Docker Compose
 - Terraform
-- AWS
+- Minikube
+- AWS - EC2, VPC, ECS, LoadBalancer
 - GitHub Actions
-
-
