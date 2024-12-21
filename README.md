@@ -14,4 +14,5 @@ Projeto de Terraform para subir uma aplicação uma aplicação feita em Node.js
 - Terraform
 - Minikube
 - AWS - EC2, VPC, ECS, LoadBalancer
+- Shell script
 - GitHub Actions
