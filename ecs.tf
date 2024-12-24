@@ -17,10 +17,9 @@ resource "aws_ecs_task_definition" "deploy_api" {
   container_definitions = jsonencode([
     {
       "name" : "node-api-server",
-      "image" : "${var.ecr_repo_url}",
+      "image" : "${var.ecr_repo_url_api}",
       "essential" : true,
-      "entryPoint" : [],
-      "command": ["node", "server/server.js"],
+      "entryPoint" : ["node", "server/server.js"],
       "portMappings" : [
         {
           "containerPort" : "${var.api_container_port}",
@@ -28,31 +27,31 @@ resource "aws_ecs_task_definition" "deploy_api" {
           "protocol" : "tcp"
         }
       ],
-      "dependsOn" : [
-        {
-          "containerName" : "postgres",
-          "condition" : "COMPLETE"
-        }
-      ],
+      # "dependsOn" : [
+      #   {
+      #     "containerName" : "postgres",
+      #     "condition" : "COMPLETE"
+      #   }
+      # ],
       "environment" : [
         {
-          "name" : "DB_HOST",
+          "name" : "POSTGRES_HOST",
           "value" : "${var.db_host}"
         },
         {
-          "name" : "DB_PORT",
+          "name" : "POSTGRES_PORT",
           "value" : "${var.db_port}"
         },
         {
-          "name" : "DB_USER",
+          "name" : "POSTGRES_USER",
           "value" : "${var.db_user}"
         },
         {
-          "name" : "DB_PASS",
+          "name" : "POSTGRES_PASSWORD",
           "value" : "${var.db_pass}"
         },
         {
-          "name" : "DB_NAME",
+          "name" : "POSTGRES_DB",
           "value" : "${var.db_name}"
         }
       ],
@@ -66,31 +65,31 @@ resource "aws_ecs_task_definition" "deploy_api" {
         }
       }
     },
-    {
-      "name" : "vue-app",
-      "image" : "matheusmello09/vue-js:latest",
-      "essential" : true,
-      "portMappings" : [
-        {
-          "containerPort" : "${var.web_container_port}",
-          "hostPort" : "${var.web_host_port}",
-          "protocol" : "tcp"
-        }
-      ]
-      "logConfiguration" : {
-        "logDriver" : "awslogs",
-        "options" : {
-          "awslogs-group" : aws_cloudwatch_log_group.ecs_log_group.name,
-          "awslogs-region" : "us-east-2",
-          "awslogs-stream-prefix" : "ecs",
-          "awslogs-create-group" : "true"
-        }
-      }
-    },
+    # {
+    #   "name" : "vue-app",
+    #   "image" : "${var.ecr_repo_url_web}",
+    #   "essential" : true,
+    #   "portMappings" : [
+    #     {
+    #       "containerPort" : "${var.web_container_port}",
+    #       "hostPort" : "${var.web_host_port}",
+    #       "protocol" : "tcp"
+    #     }
+    #   ]
+    #   "logConfiguration" : {
+    #     "logDriver" : "awslogs",
+    #     "options" : {
+    #       "awslogs-group" : aws_cloudwatch_log_group.ecs_log_group.name,
+    #       "awslogs-region" : "us-east-2",
+    #       "awslogs-stream-prefix" : "ecs",
+    #       "awslogs-create-group" : "true"
+    #     }
+    #   }
+    # },
     {
       "name" : "postgres",
-      "image" : "matheusmello09/postgres-with-schema:latest",
-      "essential" : false,
+      "image" : "${var.ecr_repo_url_db}",
+      "essential" : true,
       "portMappings" : [
         {
           "containerPort" : 5432,
@@ -110,7 +109,7 @@ resource "aws_ecs_task_definition" "deploy_api" {
         {
           "name" : "POSTGRES_DB",
           "value" : "${var.db_name}"
-        }
+        },
       ],
       "logConfiguration" : {
         "logDriver" : "awslogs",
@@ -137,8 +136,8 @@ resource "aws_ecs_service" "ecs_service" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.ecs_tg.arn
-    container_name   = "vue-app"
-    container_port   = var.web_container_port
+    container_name   = "node-api-server"
+    container_port   = var.api_container_port
   }
 
   network_configuration {

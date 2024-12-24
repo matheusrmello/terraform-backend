@@ -90,6 +90,14 @@ resource "aws_security_group" "sg_k8s" {
   }
 
   ingress {
+    description = "Allow SSH"
+    from_port   = 31080
+    to_port     = 31080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
     description = "Allow HTTP"
     from_port   = 80
     to_port     = 80

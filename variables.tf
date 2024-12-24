@@ -48,7 +48,17 @@ variable "container_name" {
   default     = "test_task_backend_api"
 }
 
-variable "ecr_repo_url" {
+variable "ecr_repo_url_api" {
+  description = "The ECR repository URL for the container image"
+  type        = string
+}
+
+variable "ecr_repo_url_web" {
+  description = "The ECR repository URL for the container image"
+  type        = string
+}
+
+variable "ecr_repo_url_db" {
   description = "The ECR repository URL for the container image"
   type        = string
 }
@@ -100,7 +110,7 @@ variable "db_port" {
 }
 variable "desired_count" {
   description = "number os desired tasks"
-  default     = 1
+  default     = 2
 }
 
 ################# VPC #########################
