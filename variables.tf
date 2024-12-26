@@ -73,16 +73,6 @@ variable "api_host_port" {
   default     = 4000
 }
 
-variable "web_container_port" {
-  description = "The container port to expose"
-  default     = 3000
-}
-
-variable "web_host_port" {
-  description = "The host port to map to the container port"
-  default     = 3000
-}
-
 variable "db_host" {
   description = "The database host"
   default     = "postgres"
@@ -110,7 +100,7 @@ variable "db_port" {
 }
 variable "desired_count" {
   description = "number os desired tasks"
-  default     = 2
+  default     = 1
 }
 
 ################# VPC #########################

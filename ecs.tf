@@ -19,41 +19,17 @@ resource "aws_ecs_task_definition" "deploy_api" {
       "name" : "node-api-server",
       "image" : "${var.ecr_repo_url_api}",
       "essential" : true,
-      "entryPoint" : ["node", "server/server.js"],
       "portMappings" : [
         {
-          "containerPort" : "${var.api_container_port}",
-          "hostPort" : "${var.api_host_port}",
-          "protocol" : "tcp"
+          "containerPort" : "${var.api_container_port}"
         }
       ],
-      # "dependsOn" : [
-      #   {
-      #     "containerName" : "postgres",
-      #     "condition" : "COMPLETE"
-      #   }
-      # ],
       "environment" : [
-        {
-          "name" : "POSTGRES_HOST",
-          "value" : "${var.db_host}"
-        },
-        {
-          "name" : "POSTGRES_PORT",
-          "value" : "${var.db_port}"
-        },
-        {
-          "name" : "POSTGRES_USER",
-          "value" : "${var.db_user}"
-        },
-        {
-          "name" : "POSTGRES_PASSWORD",
-          "value" : "${var.db_pass}"
-        },
-        {
-          "name" : "POSTGRES_DB",
-          "value" : "${var.db_name}"
-        }
+        { "name" : "POSTGRES_HOST", "value" : "postgres" },
+        { "name" : "POSTGRES_PORT", "value" : "5432" },
+        { "name" : "POSTGRES_USER", "value" : "root" },
+        { "name" : "POSTGRES_PASSWORD", "value" : "928BDeuE" },
+        { "name" : "POSTGRES_DB", "value" : "blog" }
       ],
       "logConfiguration" : {
         "logDriver" : "awslogs",
@@ -65,51 +41,26 @@ resource "aws_ecs_task_definition" "deploy_api" {
         }
       }
     },
-    # {
-    #   "name" : "vue-app",
-    #   "image" : "${var.ecr_repo_url_web}",
-    #   "essential" : true,
-    #   "portMappings" : [
-    #     {
-    #       "containerPort" : "${var.web_container_port}",
-    #       "hostPort" : "${var.web_host_port}",
-    #       "protocol" : "tcp"
-    #     }
-    #   ]
-    #   "logConfiguration" : {
-    #     "logDriver" : "awslogs",
-    #     "options" : {
-    #       "awslogs-group" : aws_cloudwatch_log_group.ecs_log_group.name,
-    #       "awslogs-region" : "us-east-2",
-    #       "awslogs-stream-prefix" : "ecs",
-    #       "awslogs-create-group" : "true"
-    #     }
-    #   }
-    # },
     {
       "name" : "postgres",
-      "image" : "${var.ecr_repo_url_db}",
+      "image" : "matheusmello09/postgres:latest",
       "essential" : true,
       "portMappings" : [
         {
-          "containerPort" : 5432,
-          "hostPort" : 5432,
-          "protocol" : "tcp"
+          "containerPort" : 5432
         }
       ],
       "environment" : [
+        { "name" : "POSTGRES_USER", "value" : "root" },
+        { "name" : "POSTGRES_PASSWORD", "value" : "928BDeuE" },
+        { "name" : "POSTGRES_DB", "value" : "blog" }
+      ],
+      "mountPoints" : [
         {
-          "name" : "POSTGRES_USER",
-          "value" : "${var.db_user}"
-        },
-        {
-          "name" : "POSTGRES_PASSWORD",
-          "value" : "${var.db_pass}"
-        },
-        {
-          "name" : "POSTGRES_DB",
-          "value" : "${var.db_name}"
-        },
+          "sourceVolume" : "db-data",
+          "containerPath" : "/var/lib/postgresql/data",
+          "readOnly" : false
+        }
       ],
       "logConfiguration" : {
         "logDriver" : "awslogs",
@@ -122,7 +73,15 @@ resource "aws_ecs_task_definition" "deploy_api" {
       }
     }
   ])
+
+  volume {
+    name = "db-data"
+    efs_volume_configuration {
+      file_system_id = aws_efs_file_system.db_efs.id
+    }
+  }
 }
+
 
 resource "aws_ecs_service" "ecs_service" {
   name                 = var.cluster_name
@@ -152,4 +111,15 @@ resource "aws_ecs_service" "ecs_service" {
 resource "aws_cloudwatch_log_group" "ecs_log_group" {
   name              = "/ecs/api-service"
   retention_in_days = 1
+}
+
+resource "aws_efs_file_system" "db_efs" {
+  creation_token   = "blog-efs"
+  performance_mode = "generalPurpose"
+}
+
+resource "aws_efs_mount_target" "efs_mount" {
+  file_system_id  = aws_efs_file_system.db_efs.id
+  subnet_id       = aws_subnet.private_subnet_1.id
+  security_groups = [aws_security_group.ecs_sg.id]
 }
