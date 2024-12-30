@@ -17,7 +17,7 @@ resource "aws_ecs_task_definition" "deploy_api" {
   container_definitions = jsonencode([
     {
       "name" : "node-api-server",
-      "image" : "${var.ecr_repo_url_api}",
+      "image" : "654654369899.dkr.ecr.us-east-2.amazonaws.com/test-matheus-app-node-api:latest",
       "essential" : true,
       "portMappings" : [
         {
@@ -25,11 +25,11 @@ resource "aws_ecs_task_definition" "deploy_api" {
         }
       ],
       "environment" : [
-        { "name" : "POSTGRES_HOST", "value" : "postgres" },
-        { "name" : "POSTGRES_PORT", "value" : "5432" },
-        { "name" : "POSTGRES_USER", "value" : "root" },
-        { "name" : "POSTGRES_PASSWORD", "value" : "928BDeuE" },
-        { "name" : "POSTGRES_DB", "value" : "blog" }
+        { "name" : "DB_HOST", "value" : "localhost" },
+        { "name" : "DB_PORT", "value" : "5432" },
+        { "name" : "DB_USER", "value" : "root" },
+        { "name" : "DB_PASSWORD", "value" : "928BDeuE" },
+        { "name" : "DB_NAME", "value" : "blog" }
       ],
       "logConfiguration" : {
         "logDriver" : "awslogs",
@@ -43,7 +43,7 @@ resource "aws_ecs_task_definition" "deploy_api" {
     },
     {
       "name" : "postgres",
-      "image" : "matheusmello09/postgres:latest",
+      "image" : "654654369899.dkr.ecr.us-east-2.amazonaws.com/test-matheus-postgres:latest",
       "essential" : true,
       "portMappings" : [
         {
@@ -123,3 +123,42 @@ resource "aws_efs_mount_target" "efs_mount" {
   subnet_id       = aws_subnet.private_subnet_1.id
   security_groups = [aws_security_group.ecs_sg.id]
 }
+
+# resource "aws_service_discovery_private_dns_namespace" "postgres_discovery_service" {
+#   name = "my_service.local"
+#   vpc = aws_vpc.project_vpc.id
+# }
+
+# resource "aws_service_discovery_service" "postgres_service" {
+#   name              = "postgres"
+#   dns_config {
+#     namespace_id = aws_service_discovery_private_dns_namespace.postgres_discovery_service.id
+#     dns_records {
+#       ttl  = 60
+#       type = "A"
+#     }
+#   }
+#   health_check_custom_config {
+#     failure_threshold = 1
+#   }
+# }
+
+# resource "aws_ecs_service" "ecs_postgres" {
+#   name = "postgres"
+#   cluster = aws_ecs_cluster.cluster_backend.id
+#   task_definition = aws_ecs_task_definition.deploy_api.arn
+#   desired_count        = var.desired_count
+#   launch_type          = "FARGATE"
+#   scheduling_strategy  = "REPLICA"
+#   force_delete         = true
+#   force_new_deployment = true
+
+#   network_configuration {
+#     assign_public_ip = false
+#     security_groups = [aws_security_group.ecs_sg.id]
+#     subnets = [aws_subnet.private_subnet_1.id, aws_subnet.private_subnet_2.id, aws_subnet.private_subnet_3.id]
+#   }
+#   service_registries {
+#     registry_arn = aws_service_discovery_service.postgres_service.arn
+#   }
+# }
