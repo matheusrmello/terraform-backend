@@ -32,8 +32,8 @@ resource "aws_instance" "instance-docker" {
       "sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose",
       "sudo chmod +x /usr/local/bin/docker-compose",
       "sleep 15",
-      "git clone https://github.com/matheusrmello/compose-ezops.git",
-      "cd compose-ezops",
+      "git clone https://github.com/matheusrmello/api-compose.git",
+      "cd api-compose",
       "sleep 15",
       "sudo docker-compose up -d"
     ]
@@ -87,12 +87,12 @@ resource "aws_instance" "instance-k8s" {
       "chmod +x kubectl",
       "sudo mv kubectl /usr/local/bin/",
       "sleep 10",
-      "git clone https://github.com/matheusrmello/compose-ezops.git",
+      "git clone https://github.com/matheusrmello/api-compose.git",
       "sudo minikube start driver=docker --force",
       "sudo minikube addons enable ingress",
       "sudo minikube addons enable csi-hostpath-driver",
       "sleep 15",
-      "cd compose-ezops/k8s/",
+      "cd api-compose/k8s/",
       "sudo kubectl create ns test",
       "sudo kubectl apply -f ./ -n test",
     ]
