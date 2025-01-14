@@ -53,14 +53,14 @@
 
 # data "aws_acm_certificate" "amazon_issued" {
 #   provider    = aws.us_east_1
-#   domain      = "exam.ezopscloud.tech"
+#   domain      = "mrmello.com.br"
 #   types       = ["AMAZON_ISSUED"]
 #   statuses    = ["ISSUED"]
 #   most_recent = true
 # }
 
 # data "aws_route53_zone" "zone" {
-#   name         = "exam.ezopscloud.tech."
+#   name         = "mrmello.com.br."
 #   private_zone = false
 # }
 
